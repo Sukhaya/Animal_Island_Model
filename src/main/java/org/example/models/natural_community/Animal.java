@@ -9,11 +9,13 @@ import org.example.utils.Randomizer;
 import org.example.utils.SimulationSettings;
 import org.example.utils.SimulationSettings.AnimalConfig;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public abstract class Animal {
 
     protected final AnimalConfig config;
     protected double satiety;
-    protected boolean isAlive = true;
+    protected AtomicBoolean isAlive = new AtomicBoolean(true);
     protected Location location;
 
     public Animal(AnimalConfig config) {
@@ -26,7 +28,7 @@ public abstract class Animal {
     public abstract void multiply(Location location);
 
     public void move(Island island) {
-        if (!isAlive || location == null || Randomizer.nextDouble() > 0.7) return;
+        if (!isAlive.get() || location == null || Randomizer.nextDouble() > 0.7) return;
 
         // Выбираем случайное направление из enum Direction
         Direction direction = Randomizer.randomEnum(Direction.class);
@@ -51,8 +53,7 @@ public abstract class Animal {
 
 
     public void die() {
-        if (isAlive) {
-            isAlive = false;
+        if (isAlive.getAndSet(false)) {
             if (location != null) {
                 location.removeAnimal(this);
             }
@@ -78,7 +79,7 @@ public abstract class Animal {
     }
 
     public boolean isAlive() {
-        return isAlive;
+        return isAlive.get();
     }
 
     public Location getLocation() {
