@@ -4,10 +4,7 @@ import org.example.models.natural_community.Animal;
 import org.example.statistic.Statistics;
 import org.example.utils.SimulationSettings;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,6 +28,10 @@ public class Location {
         this.x = x;
         this.y = y;
         initializePlants();
+    }
+
+    public ConcurrentHashMap<Class<? extends Animal>, BlockingQueue<Animal>> getAnimalsMap() {
+        return animals;
     }
 
     private void initializePlants() {

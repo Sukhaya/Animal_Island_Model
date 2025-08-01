@@ -96,7 +96,14 @@ public class Simulation {
                         .count();
             }
         }
+
         Statistics.updateAnimals(animalCount);
+
+        // Проводим сверку на неучтенных животных
+        Statistics.validateAnimalCounts(island);
+
+        // Сверяем соответствие животных с фактическим на карте
+        Statistics.validateConsistency();
 
         // Печатаем статистику через заданные интервалы
         if (currentDay % SimulationSettings.STATISTICS_PRINT_INTERVAL_DAYS == 0) {

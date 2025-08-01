@@ -1,7 +1,5 @@
 package org.example.enums;
 
-import org.example.models.natural_community.Animal;
-
 public enum Emoji {
     BUFFALO ("🐃"),
     BEAR ("🐻"),
@@ -18,7 +16,11 @@ public enum Emoji {
     DUCK ("🦆"),
     MOUSE ("🐁"),
     CATERPILLAR ("🐛"),
-    PLANT ("🌱");
+    PLANT ("🌱"),
+    BIRTH ("\uD83C\uDF7C"),
+    HUNGER_DEATH("⚰️"),
+    DEATH("☠️"),
+    ANIMAL_PAW("\uD83D\uDC3E ");
 
     private final String emoji;
 

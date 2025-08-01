@@ -1,7 +1,6 @@
 package org.example.models.natural_community;
 
 import org.example.models.Location;
-import org.example.statistic.Statistics;
 import org.example.utils.Randomizer;
 import org.example.utils.SimulationSettings;
 
@@ -41,7 +40,6 @@ public abstract class Predator extends Animal {
             satiety += nutrition;
             prey.die(); // Уничтожаем жертву, вызывая метод die()
             // Записываем факт убийства жертвы в статистику
-            Statistics.recordDeathByPredation(prey);
         }
     }
 
@@ -52,7 +50,6 @@ public abstract class Predator extends Animal {
         if (sameSpecies.size() >= 2 && Randomizer.getProbability(config.reproductionChance * 100)) {
             Animal offspring = createChild(); // Метод должен быть реализован в подклассах
             location.addAnimal(offspring); // Добавляем потомка в локацию (в эту же локацию)
-            Statistics.recordBirth(offspring);
         }
     }
 }

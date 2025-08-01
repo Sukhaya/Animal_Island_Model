@@ -1,7 +1,13 @@
 package org.example.statistic;
 
+import org.example.enums.Emoji;
+import org.example.models.Island;
+import org.example.models.Location;
 import org.example.models.natural_community.Animal;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -9,7 +15,6 @@ public class Statistics {
 
     // Потокобезопасная карта, которая будет хранить количество животных по их типам (классам)
     private static final ConcurrentHashMap<Class<?>, AtomicInteger> animalCounts = new ConcurrentHashMap<>();
-
     // Атомарные счетчики для хранения общего количества растений и различных типов смертей
     private static final AtomicInteger totalPlants = new AtomicInteger(0); // Общее количество растений
     private static final AtomicInteger totalAnimals = new AtomicInteger(0); // Общее количество животных
@@ -63,7 +68,7 @@ public class Statistics {
 
     // Метод для вывода общей статистики на экран
     public static void printStatistics() {
-        System.out.println("\n=== Общая статистика ==="); // Заголовок статистики
+        System.out.print("\n=== Общая статистика ==="); // Заголовок статистики
 
         // Проходим по всем типам животных и их количеству в карте
         animalCounts.forEach((cls, count) -> {
@@ -80,11 +85,69 @@ public class Statistics {
         });
 
         // Выводим статистику по растениям и смертям
-        System.out.println("\nРастений: " + totalPlants.get()); // Общее количество растений
-        System.out.println("Рождений: " + totalBirths.get()); // Общее количество рождений
-        System.out.println("Смертей от голода: " + totalDeathsByHunger.get()); // Смерти от голода
-        System.out.println("Смертей от хищников: " + totalDeathsByPredation.get()); // Смерти от хищников
-        System.out.println("Общее количество животных на конец дня: " + totalAnimals.get()); // Общее количество животных
+        System.out.println("\n=== Изменение количества ===");
+        System.out.println(Emoji.PLANT.getEmoji() + " Растений: " + totalPlants.get()); // Общее количество растений
+        System.out.println(Emoji.BIRTH.getEmoji() + " Рождений: " + totalBirths.get()); // Общее количество рождений
+        System.out.println(Emoji.HUNGER_DEATH.getEmoji() + " Смертей от голода: " + totalDeathsByHunger.get()); // Смерти от голода
+        System.out.println(Emoji.DEATH.getEmoji() + " Смертей от хищников: " + totalDeathsByPredation.get()); // Смерти от хищников
+        System.out.println("\nОбщее количество животных на конец дня: " + Emoji.ANIMAL_PAW.getEmoji() + totalAnimals.get()); // Общее количество животных
         System.out.println("========================"); // Разделитель
+    }
+
+
+    // Проверяем, совпадает ли статистика с картой
+    public static void validateConsistency() {
+        int expected = totalBirths.get() - totalDeathsByHunger.get() - totalDeathsByPredation.get();
+        int actual = animalCounts.values().stream().mapToInt(AtomicInteger::get).sum();
+
+        if (expected != actual) {
+            System.out.println("[❌] Несовпадение: expected = " + expected + ", actual = " + actual);
+        } else {
+            System.out.println("[✅] Статистика совпадает: " + actual + " животных");
+        }
+    }
+
+    // Метод сверки по поиску животных, которых больше нет, но остались в статистике
+    public static void validateAnimalCounts(Island island) {
+        // Подсчитаем животных на острове "вручную"
+        Map<Class<?>, Integer> actualCounts = new HashMap<>();
+
+        for (Location[] row : island.getLocations()) {
+            for (Location location : row) {
+                for (Queue<Animal> queue : location.getAnimalsMap().values()) {
+                    for (Animal animal : queue) {
+                        if (animal.isAlive()) {
+                            actualCounts.merge(animal.getClass(), 1, Integer::sum);
+                        }
+                    }
+                }
+            }
+        }
+
+        boolean mismatch = false;
+
+        // Сравниваем с animalCounts
+        for (Map.Entry<Class<?>, Integer> entry : actualCounts.entrySet()) {
+            Class<?> animalType = entry.getKey();
+            int actual = entry.getValue();
+            int recorded = animalCounts.getOrDefault(animalType, new AtomicInteger(0)).get();
+
+            if (actual != recorded) {
+                mismatch = true;
+                System.out.printf("[⚠] %s: на острове %d, в статистике %d%n", animalType.getSimpleName(), actual, recorded);
+            }
+        }
+
+        // Поиск животных, которых больше нет, но остались в статистике
+        for (Class<?> type : animalCounts.keySet()) {
+            if (!actualCounts.containsKey(type)) {
+                mismatch = true;
+                System.out.printf("[❌] %s: в статистике %d, но на острове отсутствует%n", type.getSimpleName(), animalCounts.get(type).get());
+            }
+        }
+
+        if (!mismatch) {
+            System.out.println("[✅] Счётчики животных соответствуют реальности.");
+        }
     }
 }

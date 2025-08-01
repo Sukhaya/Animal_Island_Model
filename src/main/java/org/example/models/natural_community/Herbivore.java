@@ -2,7 +2,6 @@ package org.example.models.natural_community;
 
 import org.example.models.Location;
 import org.example.models.natural_community.herbivores.Caterpillar;
-import org.example.statistic.Statistics;
 import org.example.utils.Randomizer;
 import org.example.utils.SimulationSettings;
 
@@ -41,7 +40,6 @@ public abstract class Herbivore extends Animal {
         if (sameSpecies.size() >= 2 && Randomizer.getProbability(config.reproductionChance * 100)) {
             Animal offspring = createChild(); // Метод должен быть реализован в подклассах
             location.addAnimal(offspring); // Добавляем потомка в локацию (в эту же локацию)
-            Statistics.recordBirth(offspring);
         }
     }
 
@@ -62,7 +60,6 @@ public abstract class Herbivore extends Animal {
             double nutrition = Math.min(caterpillar.getWeight(), config.foodNeeded - satiety);
             satiety += nutrition; // Увеличиваем уровень сытости травоядного
             caterpillar.die(); // Уничтожаем гусеницу
-            Statistics.recordDeathByPredation(caterpillar); // Записываем факт убийства гусеницы в статистику
             return true; // Возвращаем true, указывая на успешное поедание
         }
         return false; // Возвращаем false, если поедание не удалось

@@ -56,16 +56,16 @@ public abstract class Animal {
             if (location != null) {
                 location.removeAnimal(this);
             }
-                // Статистика должна сработать в любом случае
-                if (satiety <= 0) {
-                    // Регистрация смерти от голода
-                    Statistics.recordDeathByHunger(this);
-                } else {
-                    // Регистрация смерти от хищника
-                    Statistics.recordDeathByPredation(this);
-                }
-            }
 
+            // Статистика должна сработать в любом случае
+            if (satiety <= 0) {
+                // Регистрация смерти от голода
+                Statistics.recordDeathByHunger(this);
+            } else {
+                // Регистрация смерти от хищника
+                Statistics.recordDeathByPredation(this);
+            }
+        }
     }
 
     public void satiety() { //сытость
@@ -73,11 +73,17 @@ public abstract class Animal {
         if (satiety <= 0) die();
     }
 
-    public double getWeight() { return config.weight; }
+    public double getWeight() {
+        return config.weight;
+    }
 
-    public boolean isAlive() { return isAlive; }
+    public boolean isAlive() {
+        return isAlive;
+    }
 
-    public Location getLocation() { return location; }
+    public Location getLocation() {
+        return location;
+    }
 
     public abstract Emoji getEmoji();
 }
